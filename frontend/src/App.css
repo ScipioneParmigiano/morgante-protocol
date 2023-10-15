@@ -1,0 +1,15 @@
+.particle-background {
+    position: fixed;
+    top: 100vh;
+    /* Start off-screen */
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: black;
+    transition: top 1s ease;
+    /* Smooth transition */
+}
+
+.particle-background.loaded {
+    top: 0;
+}
