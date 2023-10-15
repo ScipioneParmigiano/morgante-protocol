@@ -10,8 +10,6 @@ import {Mordred} from "src/MordredToken.sol";
 import {Ownable} from "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 import {Pausable} from "lib/openzeppelin-contracts/contracts/security/Pausable.sol";
 
-pragma solidity ^0.8.19;
-
 /*
  * The following contract is a liquidity pool in which users can deposit some predefined tokens to receive an interest.
  * The interest come from the flash loans that the pool provide.

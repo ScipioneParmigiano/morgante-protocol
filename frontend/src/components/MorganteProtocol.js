@@ -15,7 +15,7 @@ import {
 /* global BigInt */
 
 const MorganteProtocol = () => {
-    let MorganteProtocolAddressSepolia = '0x13f0d723711579C88861CaE6A849a7126ab2eB7b';
+    let MorganteProtocolAddressSepolia = '0xf9f79eC572f93A7A4c36c419CFadA1987dc8B429';
 
     let linkSepoliaAddress = '0x279cBF5B7e3651F03CB9b71A9E7A3c924b267801';
     let wbtcSepoliaAddress = '0x5EA79f3190ff37418d42F9B2618688494dBD9693';
@@ -102,7 +102,7 @@ const MorganteProtocol = () => {
                 let val = await contract.getmddAmountOwned(signer)
                 console.log(val)
 
-                updateUserMorganteBalance(String(parseInt(val) / 1e8));
+                updateUserMorganteBalance(String(parseInt(val) / 1e18));
             }
         }
 
@@ -183,11 +183,11 @@ const MorganteProtocol = () => {
 
         if (selectedToken === 'LINK') {
             let link = new ethers.Contract(linkSepoliaAddress, collateralAbi, signer);
-            let tx = await link.approve(MordredeAddress, event.target.amountCollateral.value * 1e18)
+            let tx = await link.approve(MordredeAddress, ethers.parseEther(event.target.amountCollateral.value))
 
-            // await tx.wait()
+            await tx.wait()
 
-            await contract.deposit(event.target.amountCollateral.value * 1e18, ethers.parseEther(event.target.amountMordredToMint.value), linkSepoliaAddress);
+            await contract.deposit(ethers.parseEther(event.target.amountCollateral.value), ethers.parseEther(event.target.amountMordredToMint.value), linkSepoliaAddress);
         }
 
         // console.log(networkId)
@@ -202,7 +202,7 @@ const MorganteProtocol = () => {
 
             // await contract.deposit(1000000n, 1n, wbtcSepoliaAddress);
 
-            // await contract.deposit(ethers.parseEther(event.target.amountCollateral.value) / BigInt(1e10), ethers.parseEther(event.target.amountMordredToMint.value), wbtcSepoliaAddress);
+            await contract.deposit(ethers.parseEther(event.target.amountCollateral.value) / BigInt(1e10), ethers.parseEther(event.target.amountMordredToMint.value), wbtcSepoliaAddress);
             console.log("types 2")
         }
 
@@ -225,12 +225,12 @@ const MorganteProtocol = () => {
 
         if (selectedToken === 'LINK') {
             console.log('withdrawing ' + event.target.amountCollateral.value + ' ' + String(selectedToken) + ' from the protocol and burning ' + event.target.amountMordredToBurn.value + ' Mordred');
-            await contract.withdraw(linkSepoliaAddress, event.target.amountCollateral.value * 1e18, ethers.parseEther(event.target.amountMordredToBurn.value));
+            await contract.withdraw(linkSepoliaAddress, ethers.parseEther(event.target.amountCollateral.value), ethers.parseEther(event.target.amountMordredToBurn.value));
         }
 
         if (selectedToken === 'wBTC') {
             console.log('withdrawing ' + event.target.amountCollateral.value + ' ' + String(selectedToken) + ' from the protocol and burning ' + event.target.amountMordredToBurn.value + ' Mordred');
-            await contract.withdraw(wbtcSepoliaAddress, event.target.amountCollateral.value * 1e8, ethers.parseEther(event.target.amountMordredToBurn.value));
+            await contract.withdraw(wbtcSepoliaAddress, ethers.parseEther(event.target.amountCollateral.value) / BigInt(1e10), ethers.parseEther(event.target.amountMordredToBurn.value));
         }
     }
 
