@@ -38,7 +38,6 @@ contract FlashLoanUnitTestsOne is Test {
         uint256 indexed amount
     );
     event updatedFlashLoansFee(uint256 newFee);
-
     event CollateralDeposited(
         address indexed sender,
         address indexed token,
@@ -50,7 +49,6 @@ contract FlashLoanUnitTestsOne is Test {
         address indexed tokenCollateralAddress,
         uint256 amountCollateral
     );
-
     ///////////////
     // variables //
     ///////////////
@@ -62,9 +60,7 @@ contract FlashLoanUnitTestsOne is Test {
     Mordred mdd;
     MordredEngine mdde;
     MockV3Aggregator mockV3Aggregator = new MockV3Aggregator(18, 1);
-
     address user = makeAddr("BOB");
-    address flashLoanDeployer = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
     uint256 initial_balance = 1000 ether;
     uint256 constant ACCURACY = 1e12;
     address public linkUsdPriceFeed;
@@ -98,10 +94,9 @@ contract FlashLoanUnitTestsOne is Test {
             timeLock,
             governor
         ) = deployer.run();
+        address flashLoanDeployer = pool.owner();
+        vm.deal(user, initial_balance);
 
-        if (block.chainid == 31337) {
-            vm.deal(user, initial_balance);
-        }
         ERC20Mock(link).mint(user, initial_balance);
         ERC20Mock(wbtc).mint(user, initial_balance);
 
@@ -114,7 +109,6 @@ contract FlashLoanUnitTestsOne is Test {
         bytes32 proposerRole = timeLock.PROPOSER_ROLE();
         bytes32 executorRole = timeLock.EXECUTOR_ROLE();
         bytes32 adminRole = timeLock.TIMELOCK_ADMIN_ROLE();
-
         timeLock.grantRole(proposerRole, address(governor));
         timeLock.grantRole(executorRole, address(0));
         timeLock.revokeRole(adminRole, msg.sender);
@@ -131,19 +125,15 @@ contract FlashLoanUnitTestsOne is Test {
         uint256 seed
     ) {
         address token = _getTokenFromSeed(seed);
-
         mddAmount = bound(mddAmount, 1, type(uint96).max);
         collateralAmount = bound(collateralAmount, 1, type(uint96).max);
-
         if ((collateralAmount * _getTokenPrice(seed)) / mddAmount <= 1) return;
         if (collateralAmount > initial_balance) return;
         if (collateralAmount <= 0) return;
         if (mddAmount <= 0) return;
-
         console.log(collateralAmount);
         console.log(_getTokenPrice(seed));
         console.log(mddAmount);
-
         vm.startPrank(user);
         ERC20Mock(token).approve(address(mdde), collateralAmount);
         pool.deposit(collateralAmount, mddAmount, token);
@@ -164,19 +154,15 @@ contract FlashLoanUnitTestsOne is Test {
         uint256 seed
     ) external {
         address token = _getTokenFromSeed(seed);
-
         mddAmount = bound(mddAmount, 1, type(uint96).max);
         collateralAmount = bound(collateralAmount, 1, type(uint96).max);
-
         if ((collateralAmount * _getTokenPrice(seed)) / mddAmount <= 1) return;
         if (collateralAmount > initial_balance) return;
         if (collateralAmount <= 0) return;
         if (mddAmount <= 0) return;
-
         console.log(collateralAmount);
         console.log(_getTokenPrice(seed));
         console.log(mddAmount);
-
         vm.startPrank(user);
         ERC20Mock(token).approve(address(mdde), collateralAmount);
         pool.deposit(collateralAmount, mddAmount, token);
@@ -193,7 +179,6 @@ contract FlashLoanUnitTestsOne is Test {
 
     function testFuzz_cantDepositZero(uint256 seed) external {
         address token = _getTokenFromSeed(seed);
-
         vm.expectRevert(
             abi.encodeWithSelector(
                 FlashLoan.FlashLoan__MustBeMoreThanZero.selector
@@ -206,7 +191,6 @@ contract FlashLoanUnitTestsOne is Test {
 
     function testFuzz_cantMintZero(uint256 seed) external {
         address token = _getTokenFromSeed(seed);
-
         vm.expectRevert(
             abi.encodeWithSelector(
                 FlashLoan.FlashLoan__MustBeMoreThanZero.selector
@@ -220,7 +204,6 @@ contract FlashLoanUnitTestsOne is Test {
     function testFuzz_cantDepositNonAllowedToken(address token) external {
         if (token == link) return;
         if (token == wbtc) return;
-
         vm.expectRevert(
             abi.encodeWithSelector(
                 FlashLoan.FlashLoan__TokenNotAllowed.selector,
@@ -239,7 +222,6 @@ contract FlashLoanUnitTestsOne is Test {
         uint256 seed
     ) external deposited(collateralAmount, mddAmount, seed) {
         address token = _getTokenFromSeed(seed);
-
         vm.expectRevert();
         mdde.redeemCollateralForMordred(
             token,
@@ -257,7 +239,6 @@ contract FlashLoanUnitTestsOne is Test {
         if (wbtc == token) return;
         if (amount > initial_balance) return;
         if (amount <= 2) return;
-
         vm.prank(user);
         vm.expectRevert(
             abi.encodeWithSelector(
@@ -276,7 +257,6 @@ contract FlashLoanUnitTestsOne is Test {
         address token = _getTokenFromSeed(seed);
         if (collateralAmount > initial_balance) return;
         if (collateralAmount <= 2) return;
-
         vm.expectRevert(
             abi.encodeWithSelector(
                 FlashLoan.FlashLoan__MustBeMoreThanZero.selector
@@ -296,7 +276,6 @@ contract FlashLoanUnitTestsOne is Test {
         if (collateralAmount > initial_balance) return;
         if (collateralAmount <= 2) return;
         if (mddAmount == 0) return;
-
         vm.expectRevert(
             abi.encodeWithSelector(
                 FlashLoan.FlashLoan__CantWithdrawMoreThanDeposited.selector,
@@ -317,7 +296,6 @@ contract FlashLoanUnitTestsOne is Test {
         address token = _getTokenFromSeed(seed);
         if (collateralAmount > initial_balance) return;
         if (collateralAmount <= 2) return;
-
         vm.expectRevert(
             abi.encodeWithSelector(
                 FlashLoan.FlashLoan__MustBeMoreThanZero.selector
@@ -336,7 +314,6 @@ contract FlashLoanUnitTestsOne is Test {
         uint256 seed
     ) external deposited(collateralAmountDeposited, mddAmountMinted, seed) {
         address token = _getTokenFromSeed(seed);
-
         mddAmountMinted = bound(mddAmountMinted, 1, type(uint96).max);
         mddAmountBurned = bound(mddAmountBurned, 1, type(uint96).max);
         collateralAmountDeposited = bound(
@@ -349,23 +326,19 @@ contract FlashLoanUnitTestsOne is Test {
             1,
             type(uint96).max
         );
-
         if (
             (collateralAmountDeposited * _getTokenPrice(seed)) /
                 mddAmountMinted <=
             1
         ) return;
-
         if (collateralAmountDeposited > initial_balance) return;
         if (collateralAmountDeposited <= 0) return;
         if (mddAmountMinted <= 0) return;
         if (mddAmountBurned <= 0) return;
         if (collateralAmountWithdrawn >= collateralAmountDeposited) return;
         if (mddAmountMinted <= mddAmountBurned) return;
-
         console.log(IERC20(token).balanceOf(address(mdde)));
         vm.startPrank(user);
-
         mdd.approve(address(mdde), mddAmountBurned);
         pool.withdraw(token, collateralAmountWithdrawn, mddAmountBurned);
         assertEq(
@@ -388,15 +361,12 @@ contract FlashLoanUnitTestsOne is Test {
         address token = _getTokenFromSeed(seed);
         mddAmount = bound(mddAmount, 1, type(uint96).max);
         collateralAmount = bound(collateralAmount, 1, type(uint96).max);
-
         if ((collateralAmount * _getTokenPrice(seed)) / mddAmount <= 1) return;
         if (collateralAmount > initial_balance) return;
         if (collateralAmount <= 0) return;
         if (mddAmount <= 0) return;
-
         vm.startPrank(user);
         IERC20(token).approve(address(pool), 100 * pool.getFee());
-
         vm.expectRevert(
             abi.encodeWithSelector(
                 FlashLoan.FlashLoan__MustBeMoreThanZero.selector
@@ -414,7 +384,6 @@ contract FlashLoanUnitTestsOne is Test {
         if (wbtc == token) return;
         if (amount > initial_balance) return;
         if (amount <= 2) return;
-
         vm.prank(user);
         vm.expectRevert(
             abi.encodeWithSelector(
@@ -435,7 +404,6 @@ contract FlashLoanUnitTestsOne is Test {
         mddAmount = bound(mddAmount, 1, type(uint96).max);
         collateralAmount = bound(collateralAmount, 1, type(uint96).max);
         amountToBorrow = bound(amountToBorrow, 1, type(uint96).max);
-
         if (amountToBorrow <= 0) return;
         if (
             (amountToBorrow * (pool.getFee())) / pool.getPrecision() >=
@@ -446,10 +414,8 @@ contract FlashLoanUnitTestsOne is Test {
         if (collateralAmount <= 0) return;
         if (mddAmount <= 0) return;
         if (amountToBorrow <= pool.getPoolBalanceSingularToken(token)) return;
-
         vm.startPrank(user);
         IERC20(token).approve(address(pool), amountToBorrow * pool.getFee());
-
         vm.expectRevert(
             abi.encodeWithSelector(
                 FlashLoan.FlashLoan__InsufficientFunds.selector
@@ -469,7 +435,6 @@ contract FlashLoanUnitTestsOne is Test {
     //     mddAmount = bound(mddAmount, 1, type(uint96).max);
     //     collateralAmount = bound(collateralAmount, 1, type(uint96).max);
     //     amountToBorrow = bound(amountToBorrow, 1, type(uint96).max);
-
     //     console.log("--------------");
     //     console.log(IERC20(token).balanceOf(address(mdde)));
     //     if (amountToBorrow == 0) return;
@@ -487,7 +452,6 @@ contract FlashLoanUnitTestsOne is Test {
     //     if (amountToBorrow > pool.getPoolBalanceSingularToken(token)) return;
     //     console.log("--------------");
     //     console.log(IERC20(token).balanceOf(address(mdde)));
-
     //     console.log(amountToBorrow);
     //     vm.startPrank(user);
     //     IERC20(token).approve(
@@ -495,11 +459,9 @@ contract FlashLoanUnitTestsOne is Test {
     //         (amountToBorrow * pool.getFee()) / pool.getPrecision()
     //     );
     //     pool.borrowFlashLoan(amountToBorrow, token);
-
     //     assertEq(collateralAmount, pool.getPoolBalanceSingularToken(token));
     //     vm.stopPrank();
     // }
-
     ////////////////////////
     // internal functions //
     ////////////////////////

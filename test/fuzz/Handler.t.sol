@@ -198,9 +198,9 @@ contract Handler is Test {
         pool.claimReward(token);
     }
 
-    ///////////////////////
-    // internal function //
-    ///////////////////////
+    // ///////////////////////
+    // // internal function //
+    // ///////////////////////
     function _getCollateralFromSeed(
         uint256 collateralSeed
     ) private view returns (ERC20Mock) {

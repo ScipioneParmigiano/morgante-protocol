@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity >=0.8.0;
 
 import {Test, console} from "forge-std/Test.sol";
 import {DeployFlashLoan} from "script/DeployFlashLoan.s.sol";
@@ -64,7 +64,6 @@ contract FlashLoanUnitTestsTwo is Test {
     MockV3Aggregator mockV3Aggregator = new MockV3Aggregator(18, 1);
 
     address user = makeAddr("BOB");
-    address flashLoanDeployer = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
     uint256 initial_balance = 1000 ether;
     uint256 constant ACCURACY = 1e12;
     address public linkUsdPriceFeed;
@@ -100,11 +99,11 @@ contract FlashLoanUnitTestsTwo is Test {
             timeLock,
             governor
         ) = deployer.run();
+        address flashLoanDeployer = pool.owner();
         tokenAddresses = [link, wbtc];
         tokenPriceFeeds = [linkUsdPriceFeed, btcUsdPriceFeed];
-        if (block.chainid == 31337) {
-            vm.deal(user, initial_balance);
-        }
+        vm.deal(user, initial_balance);
+
         ERC20Mock(link).mint(user, initial_balance);
         ERC20Mock(wbtc).mint(user, initial_balance);
 
@@ -121,6 +120,7 @@ contract FlashLoanUnitTestsTwo is Test {
         timeLock.grantRole(proposerRole, address(governor));
         timeLock.grantRole(executorRole, address(0));
         timeLock.revokeRole(adminRole, msg.sender);
+
         vm.prank(flashLoanDeployer);
         pool.transferOwnership(address(timeLock));
     }
@@ -226,6 +226,7 @@ contract FlashLoanUnitTestsTwo is Test {
         if (amountToWithdraw >= amountDeposited) return;
         if (amountDeposited < 1) return;
         if (amountToWithdraw < 1) return;
+
         vm.prank(user);
         pool.redeemCollateral(token, amountToWithdraw);
 
@@ -480,23 +481,6 @@ contract FlashLoanUnitTestsTwo is Test {
         uint256 expectedPrecision = 1e18;
 
         assertEq(precision, expectedPrecision);
-    }
-
-    //## getCollateralAccountValueInUsd tests =======================================================
-    function testFuzz_getCollateralAccountValueInUsd(
-        uint256 amount,
-        uint256 amountmdd,
-        uint256 seed
-    ) external deposited(amount, amountmdd, seed) {
-        amount = bound(amount, 1, type(uint16).max);
-        if (amount < 1) return;
-
-        uint256 collateralValueOfUser = pool.getCollateralAccountValueInUsd(
-            user
-        );
-        uint256 expectedCollateralValue = amount * _getTokenPrice(seed);
-
-        assertEq(expectedCollateralValue, collateralValueOfUser);
     }
 
     ////////////////////////

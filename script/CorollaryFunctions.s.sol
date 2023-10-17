@@ -4,8 +4,7 @@ pragma solidity ^0.8.20;
 import {Script} from "../lib/forge-std/src/Script.sol";
 import {MockV3Aggregator} from "./mocks/MockV3Aggregator.s.sol";
 import {ERC20} from "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
-import {LINK} from "script/mocks/MockLINK.sol";
-import {wBTC} from "script/mocks/MockWBTC.sol";
+import {ERC20Mock} from "lib/openzeppelin-contracts/contracts/mocks/ERC20Mock.sol";
 
 contract CorollaryFunctions is Script {
     struct NetworkConfig {
@@ -32,15 +31,16 @@ contract CorollaryFunctions is Script {
         }
     }
 
-    function getScrollSepoliaConfig()
-        public
-        view
-        returns (NetworkConfig memory)
-    {
+    function getScrollSepoliaConfig() public returns (NetworkConfig memory) {
+        vm.startBroadcast();
+        ERC20Mock linkMock = new ERC20Mock("LINK", "LINK", address(this), 0);
+        ERC20Mock wbtcMock = new ERC20Mock("WBTC", "WBTC", address(this), 0);
+        vm.stopBroadcast();
+
         return
             NetworkConfig({
-                link: 0x279cBF5B7e3651F03CB9b71A9E7A3c924b267801,
-                wbtc: 0x5EA79f3190ff37418d42F9B2618688494dBD9693,
+                link: address(linkMock), //0x41a2A5dcc6CDdfb5118199e9e721a7AA91C4b274, //0x279cBF5B7e3651F03CB9b71A9E7A3c924b267801,
+                wbtc: address(wbtcMock), //0x3258d6319ac2c9699FF90Ef91d16e636B0E5f648, //0x5EA79f3190ff37418d42F9B2618688494dBD9693,
                 linkUsdPriceFeed: 0xaC3E04999aEfE44D508cB3f9B972b0Ecd07c1efb,
                 wbtcUsdPriceFeed: 0x87dce67002e66C17BC0d723Fe20D736b80CAaFda,
                 deployerKey: vm.envUint("PRIVATE_KEY")
@@ -54,8 +54,8 @@ contract CorollaryFunctions is Script {
         }
 
         vm.startBroadcast();
-        LINK linkMock = new LINK();
-        wBTC wbtcMock = new wBTC();
+        ERC20Mock linkMock = new ERC20Mock("LINK", "LINK", address(this), 0);
+        ERC20Mock wbtcMock = new ERC20Mock("WBTC", "WBTC", address(this), 0);
 
         MockV3Aggregator linkUsdPriceFeed = new MockV3Aggregator(
             DECIMALS,

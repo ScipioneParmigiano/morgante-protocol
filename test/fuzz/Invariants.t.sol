@@ -37,12 +37,10 @@ contract InvariantTest is StdInvariant, Test {
         uint256 totalMordredSupply = mdd.totalSupply();
         uint256 totalDepositedLink = IERC20(link).balanceOf(address(mdde));
         uint256 totalDepositedWBTC = IERC20(wbtc).balanceOf(address(mdde));
-
         uint256 collateralUsdValue = mdde.tokenPriceToUsd(
             link,
             totalDepositedLink
         ) + mdde.tokenPriceToUsd(wbtc, totalDepositedWBTC);
-
         assert(collateralUsdValue >= totalMordredSupply);
     }
 }
