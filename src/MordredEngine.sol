@@ -8,6 +8,7 @@ import {Mordred} from "./MordredToken.sol";
 import {Ownable} from "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 import {OracleLib} from "./libraries/OracleLib.sol";
 import {FlashLoan} from "src/Pool.sol";
+import {ERC20Mock} from "lib/openzeppelin-contracts/contracts/mocks/ERC20Mock.sol";
 
 contract MordredEngine is Ownable, ReentrancyGuard {
     ////////////
@@ -56,6 +57,8 @@ contract MordredEngine is Ownable, ReentrancyGuard {
     uint256 constant PRECISION = 1e18;
     uint256 private constant ADDITIONAL_FEED_PRECISION = 1e10;
     uint256 MIN_HEALTH_FACTOR = 1e18;
+    address tokenA;
+    address tokenB;
 
     ///////////////
     // modifiers //
@@ -74,7 +77,9 @@ contract MordredEngine is Ownable, ReentrancyGuard {
         address[] memory _tokenAddresses,
         address[] memory _priceFeedAddresses,
         Mordred _mdd,
-        FlashLoan _pool
+        FlashLoan _pool,
+        address _tokenA,
+        address _tokenB
     ) {
         if (_tokenAddresses.length != _priceFeedAddresses.length) {
             revert MordredEngine__TokenAddressesAndPriceFeedAddressesShouldHaveSameLength();
@@ -85,6 +90,8 @@ contract MordredEngine is Ownable, ReentrancyGuard {
         }
         mdd = _mdd;
         pool = _pool;
+        tokenA = _tokenA;
+        tokenB = _tokenB;
     }
 
     ///////////////
@@ -217,11 +224,38 @@ contract MordredEngine is Ownable, ReentrancyGuard {
         if (!success) revert MordredEngine__TransferFailed();
     }
 
+    //@description: function to swap a predefined amount of tokenA for some tokenB. Swaps represent the secondary yield generator for the protocol
+    function swapAForB(uint256 amountA, uint256 amountB) external {
+        bool successOne = ERC20Mock(tokenA).transferFrom(
+            msg.sender,
+            address(this),
+            amountA
+        );
+        if (!successOne) revert();
+
+        bool successTwo = ERC20Mock(tokenB).transfer(msg.sender, amountB);
+        if (!successTwo) revert();
+    }
+
+    //@description: function to swap a predefined amount of tokenB for some tokenA. Swaps represent the secondary yield generator for the protocol
+    function swapBForA(uint256 amountB, uint256 amountA) external {
+        bool successOne = ERC20Mock(tokenB).transferFrom(
+            msg.sender,
+            address(this),
+            amountB
+        );
+        if (!successOne) revert();
+
+        bool successTwo = ERC20Mock(tokenA).transfer(msg.sender, amountA);
+        if (!successTwo) revert();
+    }
+
     //@description: function to send a predefined amount of tokens to a borrower
     //@param: amount is the amount of tokens
     //@param: token is the address of the tokens
     //@param: sender is the address of the borrower
     function reward(
+        //??? missing the swap collected fees
         uint256 amount,
         address token,
         address lender

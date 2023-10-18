@@ -9,6 +9,8 @@ import {MordredEngine} from "src/MordredEngine.sol";
 import {Mordred} from "src/MordredToken.sol";
 import {Ownable} from "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 import {Pausable} from "lib/openzeppelin-contracts/contracts/security/Pausable.sol";
+import {ERC20Mock} from "lib/openzeppelin-contracts/contracts/mocks/ERC20Mock.sol";
+import {OracleLib} from "./libraries/OracleLib.sol";
 
 /*
  * The following contract is a liquidity pool in which users can deposit some predefined tokens to receive an interest.
@@ -29,6 +31,11 @@ contract FlashLoan is ReentrancyGuard, Ownable, Pausable {
         uint256 withdrawerBalance
     );
     error FlashLoan__aWeekHasNotElapsed();
+
+    ///////////
+    // types //
+    ///////////
+    using OracleLib for AggregatorV3Interface;
 
     ////////////
     // events //
@@ -69,6 +76,10 @@ contract FlashLoan is ReentrancyGuard, Ownable, Pausable {
     mapping(address userAddress => mapping(address collateralAddress => uint256 amount)) s_userCollateralBalance;
     mapping(address => uint256) s_collectedFees;
     mapping(address token => uint256 poolBalance) s_tokenToPoolBalance;
+    uint256 constant FEE = 1; // 0.1% for swaps
+    uint256 constant FEE_PRECISION = 1000; // precision for swaps
+    address tokenA;
+    address tokenB;
 
     ///////////////
     // modifiers //
@@ -97,6 +108,11 @@ contract FlashLoan is ReentrancyGuard, Ownable, Pausable {
         _;
     }
 
+    modifier tokenAvailable(address token, uint256 amountToSwap) {
+        if (amountToSwap >= ERC20Mock(token).balanceOf(address(this))) revert();
+        _;
+    }
+
     /////////////////
     // constructor //
     /////////////////
@@ -121,8 +137,12 @@ contract FlashLoan is ReentrancyGuard, Ownable, Pausable {
             _tokenAddresses,
             _priceFeedAddresses,
             mdd,
-            this
+            this,
+            _tokenAddresses[0],
+            _tokenAddresses[1]
         );
+        tokenA = _tokenAddresses[0];
+        tokenB = _tokenAddresses[1];
         mdd.transferOwnership(address(mdde));
         mdde.transferOwnership(address(this));
     }
@@ -346,6 +366,42 @@ contract FlashLoan is ReentrancyGuard, Ownable, Pausable {
         emit updatedFlashLoansFee(newFee);
     }
 
+    //@description: function to swap some tokenA for tokenB
+    //@param: amountTokenToSwap is the amount of tokenA the user want to swap
+    function swapAForB(
+        uint256 amountTokenToSwap
+    )
+        external
+        nonReentrant
+        moreThanZero(amountTokenToSwap)
+        tokenAvailable(tokenA, amountTokenToSwap)
+    {
+        uint256 amountA = calculateAmountAToSwapForB(amountTokenToSwap);
+        uint256 amountB = (amountA * (PRECISION)) / (PRECISION + FEE);
+
+        mdde.swapAForB(amountA, amountB);
+
+        s_collectedFees[tokenA] += amountA - amountB;
+    }
+
+    //@description: function to swap some tokenB for tokenA
+    //@param: amountTokenToSwap is the amount of tokenB the user want to swap
+    function swapBForA(
+        uint256 amountTokenToSwap
+    )
+        external
+        nonReentrant
+        moreThanZero(amountTokenToSwap)
+        tokenAvailable(tokenB, amountTokenToSwap)
+    {
+        uint256 amountB = calculateAmountBToSwapForA(amountTokenToSwap);
+        uint256 amountA = (amountB * (PRECISION)) / (PRECISION + FEE);
+
+        mdde.swapBForA(amountB, amountA);
+
+        s_collectedFees[tokenA] += amountA - amountB;
+    }
+
     //////////////////////
     // getter functions //
     //////////////////////
@@ -423,5 +479,41 @@ contract FlashLoan is ReentrancyGuard, Ownable, Pausable {
         } else {
             return 0;
         }
+    }
+
+    function calculateAmountAToSwapForB(
+        uint256 amountToSwap
+    ) internal view returns (uint256) {
+        AggregatorV3Interface priceFA = AggregatorV3Interface(
+            s_tokenToPriceFeeds[tokenA]
+        );
+        AggregatorV3Interface priceFB = AggregatorV3Interface(
+            s_tokenToPriceFeeds[tokenB]
+        );
+
+        (, int256 priceA, , , ) = priceFA.stalePriceCheck();
+        (, int256 priceB, , , ) = priceFB.stalePriceCheck();
+
+        return
+            (((amountToSwap * (PRECISION * uint256(priceA))) /
+                uint256(priceB)) * (FEE_PRECISION + FEE)) / FEE_PRECISION;
+    }
+
+    function calculateAmountBToSwapForA(
+        uint256 amountToSwap
+    ) internal view returns (uint256) {
+        AggregatorV3Interface priceFA = AggregatorV3Interface(
+            s_tokenToPriceFeeds[tokenA]
+        );
+        AggregatorV3Interface priceFB = AggregatorV3Interface(
+            s_tokenToPriceFeeds[tokenB]
+        );
+
+        (, int256 priceA, , , ) = priceFA.stalePriceCheck();
+        (, int256 priceB, , , ) = priceFB.stalePriceCheck();
+
+        return
+            (((amountToSwap * (PRECISION * uint256(priceB))) /
+                uint256(priceA)) * (FEE_PRECISION + FEE)) / FEE_PRECISION;
     }
 }

@@ -8,7 +8,7 @@ import {MorganteGovernor} from "src/MorganteGovernor.sol";
 import {TimeLock} from "src/TimeLock.sol";
 import {MordredEngine} from "src/MordredEngine.sol";
 import {FlashLoan} from "src/Pool.sol";
-import {MockTokenSwap} from "src/MockSwapProtocol.sol";
+import {ERC20Mock} from "lib/openzeppelin-contracts/contracts/mocks/ERC20Mock.sol";
 
 contract DeployFlashLoan is Script {
     address[] public tokenAddresses;
@@ -18,7 +18,6 @@ contract DeployFlashLoan is Script {
     address[] propser;
     address[] executors;
 
-    MockTokenSwap swap;
     CorollaryFunctions corollary;
     MorganteGovernor governor;
     Mordred qb;
@@ -54,17 +53,16 @@ contract DeployFlashLoan is Script {
         pool = new FlashLoan(tokenAddresses, tokenPriceFeed, fee);
         timeLock = new TimeLock(minDelay, propser, executors);
         governor = new MorganteGovernor(qb, timeLock);
-        swap = new MockTokenSwap(
-            link,
-            wbtc,
-            linkUsdPriceFeed,
-            wbtcUsdPriceFeed
-        );
 
         vm.stopBroadcast();
-
-        vm.prank(swap.owner());
-        swap.transferOwnership(address(pool));
+        ERC20Mock(link).mint(
+            0x3746cFd972D3292Ed2567f8fD302E1e26b143535,
+            1000 ether
+        );
+        ERC20Mock(wbtc).mint(
+            0x3746cFd972D3292Ed2567f8fD302E1e26b143535,
+            1000 ether
+        );
 
         return (
             pool,
