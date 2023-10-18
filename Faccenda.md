@@ -6,6 +6,3 @@ next steps:
 * deploy dapp (spheron?)
 * video and presentation of the protocol
 * submission
-
-
-sistemare constructor di mockswapprot e mdde nel deploy
