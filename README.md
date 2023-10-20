@@ -1,6 +1,9 @@
 # Morgante protocol
 ![Morgante](logo/lorentz.png)
 
+Video demo: ![link](https://www.loom.com/share/464147cbd8b845f891ab113ab42531f9?sid=4c14d025-2ee9-484b-8066-178976d5b69d)
+Project (brief) description: ![link](https://ethglobal.com/events/ethonline2023/project)
+
 ## Overview
 Morgante Protocol is a decentralized finance (DeFi) platform designed to facilitate the creation of a passive and diversificate income stream for lenders, encouraging them to participate in the platform.
 
