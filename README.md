@@ -27,7 +27,7 @@ Furthermore the Mordred stablecoin has the properties of a regular stablecoin an
 * hedging against volatility.
 
 ## Security measures:
-The protocol employs istandard security practices, trying to prevent reentrancy attack and other well known attack.
+The protocol employs standard security practices, trying to prevent reentrancy attack and other well known attack.
 
 ## User-friendly interface:
 Morgante Protocol offers an intuitive and user-friendly interface, allowing novice users (the next billion users) to seamlessly participate in flash lending activities. 
