@@ -6,7 +6,7 @@ Morgante Protocol is a decentralized finance (DeFi) platform designed to facilit
 
 The main feature offered by the protocol are flash loans, a type of uncollateralized loan that allows users to borrow assets instantly without providing collateral, provided the borrowed funds are returned within the same transaction block. Despite being quite a lucrative investment, flash loans are considered to be an hazardous financial activity, hence Morgante takes a proactive approach to risk management by strategically diversifying its on-chain investments beyond flash loans.
 
-## Flash loan services:
+## Flash loan services
 Morgante Protocol provides users with access to instant, uncollateralized flash loans. Borrowers can use these loans for various purposes within the DeFi ecosystem, such as:
 * arbitrage;
 * liquidations;
