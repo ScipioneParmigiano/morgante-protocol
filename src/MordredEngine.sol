@@ -10,6 +10,10 @@ import {OracleLib} from "./libraries/OracleLib.sol";
 import {FlashLoan} from "src/Pool.sol";
 import {ERC20Mock} from "lib/openzeppelin-contracts/contracts/mocks/ERC20Mock.sol";
 
+/*
+ * MordredEnrgine.sol is the engine of the whole protocol, is owned by the Pool.sol contract and is what powers swaps, as well as flash loans.
+ *
+*/
 contract MordredEngine is Ownable, ReentrancyGuard {
     ////////////
     // errors //
@@ -97,7 +101,6 @@ contract MordredEngine is Ownable, ReentrancyGuard {
     ///////////////
     // functions //
     ///////////////
-
     //@description: deposit collateral and mint Mordred
     //@param: tokenCollateralAddress is the address of the token to use as collateral
     //@param: amountCollateral is the amount of that token
