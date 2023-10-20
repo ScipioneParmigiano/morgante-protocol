@@ -129,7 +129,7 @@ const MorganteProtocol = () => {
 
         if (isConnected) {
             getUserBalance();
-            getUserBalanceMorgante(); //aggiungere la funzione ???
+            getUserBalanceMorgante();
             updateRewards();
         }
     });
@@ -196,13 +196,12 @@ const MorganteProtocol = () => {
             // console.log((ethers.parseEther(event.target.amountMordredToMint.value)))
             // console.log((ethers.parseEther(event.target.amountCollateral.value) / BigInt(1e8)))
             let wbtc = new ethers.Contract(wbtcSepoliaAddress, collateralAbi, signer);
-            let tx = await wbtc.approve(MordredeAddress, ethers.parseEther(event.target.amountCollateral.value) / BigInt(1e10))
+            let tx = await wbtc.approve(MordredeAddress, ethers.parseEther(event.target.amountCollateral.value))
             await tx.wait()
             console.log("types")
 
-            // await contract.deposit(1000000n, 1n, wbtcSepoliaAddress);
 
-            await contract.deposit(ethers.parseEther(event.target.amountCollateral.value) / BigInt(1e10), ethers.parseEther(event.target.amountMordredToMint.value), wbtcSepoliaAddress);
+            await contract.deposit(ethers.parseEther(event.target.amountCollateral.value), ethers.parseEther(event.target.amountMordredToMint.value), wbtcSepoliaAddress);
             console.log("types 2")
         }
 
@@ -211,8 +210,6 @@ const MorganteProtocol = () => {
 
     const redeem = async (event) => {
         event.preventDefault();
-
-        // await updateEthers();
 
         let MordredeAddress = await contract.returnMordredEngineAddress();
         let MorganteAddress = await contract.returnMordredTokenAddress();
@@ -230,7 +227,7 @@ const MorganteProtocol = () => {
 
         if (selectedToken === 'wBTC') {
             console.log('withdrawing ' + event.target.amountCollateral.value + ' ' + String(selectedToken) + ' from the protocol and burning ' + event.target.amountMordredToBurn.value + ' Mordred');
-            await contract.withdraw(wbtcSepoliaAddress, ethers.parseEther(event.target.amountCollateral.value) / BigInt(1e10), ethers.parseEther(event.target.amountMordredToBurn.value));
+            await contract.withdraw(wbtcSepoliaAddress, ethers.parseEther(event.target.amountCollateral.value), ethers.parseEther(event.target.amountMordredToBurn.value));
         }
     }
 
