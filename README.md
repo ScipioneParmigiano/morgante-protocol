@@ -4,6 +4,11 @@
 * Video demo: [link](https://www.loom.com/share/464147cbd8b845f891ab113ab42531f9?sid=4c14d025-2ee9-484b-8066-178976d5b69d)
 * Project (brief) description: [link](https://ethglobal.com/showcase/morgante-244vb)
 
+Addresses on Scroll Sepolia (I had some bugs while verifying the contracts):
+ * Pool.sol: 0x2b4cEf96b24f968Ae0bddf6C7CF4BA0CBddFA4Ba
+ * WBTC: 0x2dB3483bb42eb115A50bC0f2FF61bDfa4f919D19
+ * LINK: 0x7e2f41F9b08AC139bc02b420D9ed07D7ea13BdE1
+
 ## Overview
 Morgante Protocol is a decentralized finance (DeFi) platform designed to facilitate the creation of a passive and diversificate income stream for lenders, encouraging them to participate in the platform.
 
