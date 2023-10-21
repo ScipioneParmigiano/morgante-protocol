@@ -15,10 +15,10 @@ import {
 /* global BigInt */
 
 const MorganteProtocol = () => {
-    let MorganteProtocolAddressSepolia = '0x2b4cEf96b24f968Ae0bddf6C7CF4BA0CBddFA4Ba';
+    let MorganteProtocolAddressSepolia = '0xFc4ccd9fC84010E9daB51609af0C38E2128F64bE';
 
-    let linkSepoliaAddress = '0x7e2f41F9b08AC139bc02b420D9ed07D7ea13BdE1';
-    let wbtcSepoliaAddress = '0x2dB3483bb42eb115A50bC0f2FF61bDfa4f919D19';
+    let linkSepoliaAddress = '0xF18614304F6c54d030960834dE1A8C9e0b5E877E';
+    let wbtcSepoliaAddress = '0xE1F920Ee13417384DaB6E4f06ad1c04D2c35609D';
 
     const [currentContractFee, setCurrentContractFee] = useState(null);
     const [provider, setProvider] = useState(null);

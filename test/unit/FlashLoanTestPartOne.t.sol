@@ -425,43 +425,6 @@ contract FlashLoanUnitTestsOne is Test {
         vm.stopPrank();
     }
 
-    // function testFuzz_FlashLoanIsWorking(
-    //     uint256 amountToBorrow,
-    //     uint256 collateralAmount,
-    //     uint256 mddAmount,
-    //     uint256 seed
-    // ) external deposited(collateralAmount, mddAmount, seed) {
-    //     address token = _getTokenFromSeed(seed);
-    //     mddAmount = bound(mddAmount, 1, type(uint96).max);
-    //     collateralAmount = bound(collateralAmount, 1, type(uint96).max);
-    //     amountToBorrow = bound(amountToBorrow, 1, type(uint96).max);
-    //     console.log("--------------");
-    //     console.log(IERC20(token).balanceOf(address(mdde)));
-    //     if (amountToBorrow == 0) return;
-    //     if (amountToBorrow > pool.getPoolBalanceSingularToken(token)) return;
-    //     if (
-    //         (amountToBorrow * (pool.getFee())) /
-    //             pool.getPrecision() +
-    //             collateralAmount >=
-    //         initial_balance
-    //     ) return;
-    //     if ((collateralAmount * _getTokenPrice(seed)) / mddAmount <= 1) return;
-    //     if (collateralAmount > initial_balance) return;
-    //     if (collateralAmount <= 0) return;
-    //     if (mddAmount <= 0) return;
-    //     if (amountToBorrow > pool.getPoolBalanceSingularToken(token)) return;
-    //     console.log("--------------");
-    //     console.log(IERC20(token).balanceOf(address(mdde)));
-    //     console.log(amountToBorrow);
-    //     vm.startPrank(user);
-    //     IERC20(token).approve(
-    //         address(pool),
-    //         (amountToBorrow * pool.getFee()) / pool.getPrecision()
-    //     );
-    //     pool.borrowFlashLoan(amountToBorrow, token);
-    //     assertEq(collateralAmount, pool.getPoolBalanceSingularToken(token));
-    //     vm.stopPrank();
-    // }
     ////////////////////////
     // internal functions //
     ////////////////////////

@@ -54,7 +54,6 @@ contract DeployFlashLoan is Script {
         timeLock = new TimeLock(minDelay, propser, executors);
         governor = new MorganteGovernor(qb, timeLock);
 
-        vm.stopBroadcast();
         ERC20Mock(link).mint(
             0x3746cFd972D3292Ed2567f8fD302E1e26b143535,
             1000 ether
@@ -63,6 +62,7 @@ contract DeployFlashLoan is Script {
             0x3746cFd972D3292Ed2567f8fD302E1e26b143535,
             1000 ether
         );
+        vm.stopBroadcast();
 
         return (
             pool,

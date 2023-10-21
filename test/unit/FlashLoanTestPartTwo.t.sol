@@ -417,29 +417,6 @@ contract FlashLoanUnitTestsTwo is Test {
         assertEq(balance, amount);
     }
 
-    //## getCollectedTokenFeesPerToken tests ========================================================
-    // function testFuzz_getCollectedTokenFeesPerToken(
-    //     uint256 amount,
-    //     uint256 seed
-    // ) external deposited(amount, 1, seed) {
-    //     address token = _getTokenFromSeed(seed);
-    //     amount = bound(amount, 1, type(uint16).max);
-    //     if (amount <= 1) return;
-    //     if (
-    //         (amount * (pool.getFee())) / pool.getPrecision() >=
-    //         initial_balance / 2
-    //     ) return;
-
-    //     vm.startPrank(user);
-    //     IERC20(token).approve(
-    //         address(pool),
-    //         (amount * (pool.getPrecision() + pool.getFee())) /
-    //             pool.getPrecision() /
-    //             2
-    //     );
-    //     pool.borrowFlashLoan(amount / 2, token);
-    // }
-
     //## getTokenAddresses tests ====================================================================
     function test_getTokenAddresses() external {
         address[] memory collaterals = pool.getTokenAddresses();
