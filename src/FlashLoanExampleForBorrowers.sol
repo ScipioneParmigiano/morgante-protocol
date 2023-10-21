@@ -4,6 +4,10 @@ pragma solidity ^0.8.20;
 import {FlashLoan} from "./Pool.sol";
 import {IERC20} from "lib/forge-std/src/interfaces/IERC20.sol";
 
+/*
+ * Contract that shows how to use the Morgante protocol for flash loans.
+*/
+
 contract FlashLoanExampleForBorrowers {
     FlashLoan pool;
 

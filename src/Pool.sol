@@ -14,7 +14,9 @@ import {OracleLib} from "./libraries/OracleLib.sol";
 
 /*
  * The following contract is a liquidity pool in which users can deposit some predefined tokens to receive an interest.
- * The interest come from the flash loans that the pool provide.
+ * The interest come from the flash loans service that the pool provide and from the token swaps.
+ * The pool act as an intermediate agent between the LPs and the borrowers, while its core is in the MordredEngine.sol contract. 
+ * See more at https://github.com/ScipioneParmigiano/morgante-protocol/blob/main/src/MordredEngine.sol.
  */
 
 contract FlashLoan is ReentrancyGuard, Ownable, Pausable {
